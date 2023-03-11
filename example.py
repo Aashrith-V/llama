@@ -45,8 +45,7 @@ def load(
     ckpt_path = checkpoints[local_rank]
     print("Loading")
     checkpoint = torch.load(ckpt_path, map_location="cuda:"+str(local_rank))
-    print("ckpt_path")
-    print(checkpoint.type())
+    print(ckpt_path)
     with open(Path(ckpt_dir) / "params.json", "r") as f:
         params = json.loads(f.read())
 
