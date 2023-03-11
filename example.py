@@ -104,11 +104,11 @@ def main(
     generator = load_the_model(ckpt_dir, tokenizer_path, max_seq_len, max_batch_size)
     count = 0
     prompts = []
-    while(count < 100):
+    while(count < 200):
         prompt = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
         count = count + 1
         prompts.append(prompt)
-        if (count % 20 == 0): 
+        if (count % 40 == 0): 
             starter.record()
             results = infer_the_model(generator, prompts, max_gen_len, temperature, top_p)
             ender.record()
