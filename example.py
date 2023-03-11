@@ -114,7 +114,7 @@ def main(
             ender.record()
             torch.cuda.synchronize()
             curr_time = starter.elapsed_time(ender)
-            print("time takn for inference : "curr_time)
+            print("time takn for inference : ", curr_time)
             prompts = []
             print(results)
             print("\n==================================\n")
