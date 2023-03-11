@@ -69,26 +69,26 @@ def load(
         max_seq_len=max_seq_len, max_batch_size=max_batch_size, **params
     )
 
-    mem = print_memory("modelargs", handle, mem)
+    mem = print_memory("modelargs", handle)
 
     tokenizer = Tokenizer(model_path=tokenizer_path)
 
-    mem = print_memory("tokenizer", handle, mem)
+    mem = print_memory("tokenizer", handle)
 
     model_args.vocab_size = tokenizer.n_words
     torch.set_default_tensor_type(torch.cuda.HalfTensor)
     model = Transformer(model_args)
 
-    mem = print_memory("transformer", handle, mem)
+    mem = print_memory("transformer", handle)
 
     torch.set_default_tensor_type(torch.FloatTensor)
     model.load_state_dict(checkpoint, strict=False)
     
-    mem = print_memory("load state dict", handle, mem)
+    mem = print_memory("load state dict", handle)
 
     generator = LLaMA(model, tokenizer)
 
-    mem = print_memory("generator", handle, mem)
+    mem = print_memory("generator", handle)
 
     print(f"Loaded in {time.time() - start_time:.2f} seconds")
     return generator
