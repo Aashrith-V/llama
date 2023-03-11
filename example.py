@@ -19,6 +19,8 @@ from llama import ModelArgs, Transformer, Tokenizer, LLaMA
 nvidia_smi.nvmlInit()
 handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0)
 
+global mem = 0
+
 def B2G(num):
     return round(num/(1024**3),2)
 
@@ -52,9 +54,6 @@ def load(
     max_batch_size: int,
 ) -> LLaMA:
     start_time = time.time()
-    
-    mem = print_memory('Start', handle, 0)
-
     checkpoints = sorted(Path(ckpt_dir).glob("*.pth"))
     assert world_size == len(
         checkpoints
@@ -72,14 +71,28 @@ def load(
     model_args: ModelArgs = ModelArgs(
         max_seq_len=max_seq_len, max_batch_size=max_batch_size, **params
     )
+
+    mem = print_memory("modelargs", handle, mem)
+
     tokenizer = Tokenizer(model_path=tokenizer_path)
+
+    mem = print_memory("tokenizer", handle, mem)
+
     model_args.vocab_size = tokenizer.n_words
     torch.set_default_tensor_type(torch.cuda.HalfTensor)
     model = Transformer(model_args)
+
+    mem = print_memory("transformer", handle, mem)
+
     torch.set_default_tensor_type(torch.FloatTensor)
     model.load_state_dict(checkpoint, strict=False)
+    
+    mem = print_memory("load state dict", handle, mem)
 
     generator = LLaMA(model, tokenizer)
+
+    mem = print_memory("generator", handle, mem)
+
     print(f"Loaded in {time.time() - start_time:.2f} seconds")
     return generator
 
@@ -118,6 +131,9 @@ def main(
     max_batch_size: int = 32,
     max_gen_len: int = 256
 ):
+
+    mem = print_memory('Start', handle, 0)
+
     generator = load_the_model(ckpt_dir, tokenizer_path, max_seq_len, max_batch_size)
     prompt = input("enter prompt > ")
     prompts = [prompt]
