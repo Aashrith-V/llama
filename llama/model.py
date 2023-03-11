@@ -203,7 +203,7 @@ class TransformerBlock(nn.Module):
         self.layer_id = layer_id
         self.attention_norm = RMSNorm(args.dim, eps=args.norm_eps)
         self.ffn_norm = RMSNorm(args.dim, eps=args.norm_eps)
-        print_memory("transformerblock" + tostr(layer_id), handle)
+        print_memory("transformerblock" + str(layer_id), handle)
 
     def forward(self, x: torch.Tensor, start_pos: int, freqs_cis: torch.Tensor, mask: Optional[torch.Tensor]):
         h = x + self.attention.forward(self.attention_norm(x), start_pos, freqs_cis, mask)
