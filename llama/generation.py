@@ -34,8 +34,6 @@ class LLaMA:
 
         tokens = torch.full((bsz, total_len), self.tokenizer.pad_id).cuda().long()
 
-        print(tokens, total_len, bsz)
-
         for k, t in enumerate(prompt_tokens):
             tokens[k, : len(t)] = torch.tensor(t).long()
         input_text_mask = tokens != self.tokenizer.pad_id

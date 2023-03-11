@@ -116,8 +116,8 @@ def main(
             curr_time = starter.elapsed_time(ender)
             print("time takn for inference : ", curr_time)
             prompts = []
-            print(results)
-            print("\n==================================\n")
+            # print(results)
+            # print("\n==================================\n")
 
 
 if __name__ == "__main__":
