@@ -4,7 +4,6 @@
 from typing import Optional, Tuple
 from dataclasses import dataclass
 import math
-import nvidia_smi
 
 import torch
 from torch import nn
@@ -16,19 +15,6 @@ from fairscale.nn.model_parallel.layers import (
     RowParallelLinear,
     ColumnParallelLinear,
 )
-
-nvidia_smi.nvmlInit()
-handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0)
-
-def B2G(num):
-    return round(num/(1024**3),2)
-
-def print_memory(name, handle):
-    info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
-    used = info.used
-    print(f'{name}: {B2G(used)}')
-    print('------------')
-    return used
 
 @dataclass
 class ModelArgs:
