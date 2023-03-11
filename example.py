@@ -39,6 +39,7 @@ def load(
 ) -> LLaMA:
     start_time = time.time()
     checkpoints = sorted(Path(ckpt_dir).glob("*.pth"))
+    print(checkpoints)
     assert world_size == len(
         checkpoints
     ), f"Loading a checkpoint for MP={len(checkpoints)} but world size is {world_size}"
@@ -98,7 +99,7 @@ def main(
     max_gen_len: int = 256
 ):
     generator = load_the_model(ckpt_dir, tokenizer_path, max_seq_len, max_batch_size)
-    prompt = input("enter prompt >")
+    prompt = input("enter prompt > ")
     prompts = [prompt]
     results = infer_the_model(generator, prompts, max_gen_len, temperature, top_p)
 
