@@ -8,6 +8,8 @@ import torch
 import fire
 import time
 import json
+import random
+import string
 
 from pathlib import Path
 
@@ -44,9 +46,6 @@ def load(
     ckpt_path = checkpoints[local_rank]
     print("Loading")
     checkpoint = torch.load(ckpt_path, map_location="cpu")
-    print(sys.getsizeof(checkpoint))
-    print(checkpoint)
-
     with open(Path(ckpt_dir) / "params.json", "r") as f:
         params = json.loads(f.read())
 
@@ -103,18 +102,22 @@ def main(
     starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
 
     generator = load_the_model(ckpt_dir, tokenizer_path, max_seq_len, max_batch_size)
-    prompt = input("enter prompt > ")
-    prompts = [prompt]
-    starter.record()
-    results = infer_the_model(generator, prompts, max_gen_len, temperature, top_p)
-    ender.record()
-    torch.cuda.synchronize()
-    curr_time = starter.elapsed_time(ender)
-    print(curr_time)
-
-    for result in results:
-        print(result)
-        print("\n==================================\n")
+    count = 0
+    prompts = []
+    while(count < 30):
+        prompt = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+        count = count + 1
+        promts.append(prompt)
+        if (count % 10 = 0): 
+            starter.record()
+            results = infer_the_model(generator, prompts, max_gen_len, temperature, top_p)
+            ender.record()
+            torch.cuda.synchronize()
+            curr_time = starter.elapsed_time(ender)
+            print("time takn for inference : "curr_time)
+            prompts = []
+            print(results)
+            print("\n==================================\n")
 
 
 if __name__ == "__main__":
