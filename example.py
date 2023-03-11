@@ -8,6 +8,7 @@ import torch
 import fire
 import time
 import json
+import nvidia_smi
 
 from pathlib import Path
 
@@ -15,6 +16,19 @@ from fairscale.nn.model_parallel.initialize import initialize_model_parallel
 
 from llama import ModelArgs, Transformer, Tokenizer, LLaMA
 
+nvidia_smi.nvmlInit()
+handle = nvidia_smi.nvmlDeviceGetHandleByIndex('cuda:0')
+
+def B2G(num):
+    return round(num/(1024**3),2)
+
+def print_memory(name, handle, pre_used):
+    info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
+    used = info.used
+    print(f'{name}: {B2G(used)}')
+    print(f'This step use: {B2G(used-pre_used)}')
+    print('------------')
+    return used
 
 def setup_model_parallel() -> Tuple[int, int]:
     local_rank = int(os.environ.get("LOCAL_RANK", -1))
@@ -38,14 +52,20 @@ def load(
     max_batch_size: int,
 ) -> LLaMA:
     start_time = time.time()
+    
+    mem = print_memory('Start', handle, 0)
+
     checkpoints = sorted(Path(ckpt_dir).glob("*.pth"))
     assert world_size == len(
         checkpoints
     ), f"Loading a checkpoint for MP={len(checkpoints)} but world size is {world_size}"
     ckpt_path = checkpoints[local_rank]
     print("Loading")
-    checkpoint = torch.load(ckpt_path, map_location="cuda:"+str(local_rank))
-    print(ckpt_path)
+    checkpoint = torch.load(ckpt_path, map_location="cuda:0")
+
+    print(ckpt_path, local_rank, world_size)
+    mem = print_memory("checkpoint", handle, mem)
+
     with open(Path(ckpt_dir) / "params.json", "r") as f:
         params = json.loads(f.read())
 
