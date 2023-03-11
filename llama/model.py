@@ -15,6 +15,21 @@ from fairscale.nn.model_parallel.layers import (
     RowParallelLinear,
     ColumnParallelLinear,
 )
+import nvidia_smi
+
+
+nvidia_smi.nvmlInit()
+handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0)
+
+def B2G(num):
+    return round(num/(1024**3),2)
+
+def print_memory(name, handle):
+    info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
+    used = info.used
+    print(f'{name}: {B2G(used)}')
+    print('------------')
+    return used
 
 @dataclass
 class ModelArgs:
@@ -204,6 +219,8 @@ class Transformer(nn.Module):
             params.vocab_size, params.dim, init_method=lambda x: x
         )
         self.layers = torch.nn.ModuleList()
+
+        print_memory("transformer", handle)
         for layer_id in range(params.n_layers):
             self.layers.append(TransformerBlock(layer_id, params))
         self.norm = RMSNorm(params.dim, eps=params.norm_eps)

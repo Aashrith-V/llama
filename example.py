@@ -16,7 +16,21 @@ from pathlib import Path
 from fairscale.nn.model_parallel.initialize import initialize_model_parallel
 
 from llama import ModelArgs, Transformer, Tokenizer, LLaMA
+import nvidia_smi
 
+
+nvidia_smi.nvmlInit()
+handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0)
+
+def B2G(num):
+    return round(num/(1024**3),2)
+
+def print_memory(name, handle):
+    info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
+    used = info.used
+    print(f'{name}: {B2G(used)}')
+    print('------------')
+    return used
 
 def setup_model_parallel() -> Tuple[int, int]:
     local_rank = int(os.environ.get("LOCAL_RANK", -1))
@@ -52,6 +66,9 @@ def load(
     model_args: ModelArgs = ModelArgs(
         max_seq_len=max_seq_len, max_batch_size=max_batch_size, **params
     )
+
+    print_memory("start", handle)
+
     tokenizer = Tokenizer(model_path=tokenizer_path)
     model_args.vocab_size = tokenizer.n_words
     torch.set_default_tensor_type(torch.cuda.HalfTensor)
@@ -98,7 +115,6 @@ def main(
     max_batch_size: int = 512,
     max_gen_len: int = 256
 ):
-
     starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
 
     generator = load_the_model(ckpt_dir, tokenizer_path, max_seq_len, max_batch_size)
