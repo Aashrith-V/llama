@@ -53,6 +53,7 @@ def load(
     max_seq_len: int,
     max_batch_size: int,
 ) -> LLaMA:
+    global mem
     start_time = time.time()
     checkpoints = sorted(Path(ckpt_dir).glob("*.pth"))
     assert world_size == len(
