@@ -19,7 +19,7 @@ from llama import ModelArgs, Transformer, Tokenizer, LLaMA
 nvidia_smi.nvmlInit()
 handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0)
 
-global mem = 0
+mem = 0
 
 def B2G(num):
     return round(num/(1024**3),2)
