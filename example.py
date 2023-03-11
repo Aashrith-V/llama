@@ -57,10 +57,9 @@ def load(
     ), f"Loading a checkpoint for MP={len(checkpoints)} but world size is {world_size}"
     ckpt_path = checkpoints[local_rank]
     print("Loading")
-    checkpoint = torch.load(ckpt_path, map_location="cuda:0")
-
-    print(ckpt_path, local_rank, world_size)
-    print_memory("checkpoint", handle)
+    checkpoint = torch.load(ckpt_path, map_location="cpu")
+    print(sys.getsizeof(checkpoint))
+    print(checkpoint)
 
     with open(Path(ckpt_dir) / "params.json", "r") as f:
         params = json.loads(f.read())
@@ -68,24 +67,12 @@ def load(
     model_args: ModelArgs = ModelArgs(
         max_seq_len=max_seq_len, max_batch_size=max_batch_size, **params
     )
-
-    mem = print_memory("modelargs", handle)
-
     tokenizer = Tokenizer(model_path=tokenizer_path)
-
-    mem = print_memory("tokenizer", handle)
-
     model_args.vocab_size = tokenizer.n_words
     torch.set_default_tensor_type(torch.cuda.HalfTensor)
     model = Transformer(model_args)
-
-    mem = print_memory("transformer", handle)
-
     torch.set_default_tensor_type(torch.FloatTensor)
     model.load_state_dict(checkpoint, strict=False)
-    
-    mem = print_memory("load state dict", handle)
-
     generator = LLaMA(model, tokenizer)
 
     mem = print_memory("generator", handle)
