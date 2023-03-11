@@ -78,10 +78,10 @@ def load(
     return generator
 
 def load_the_model(    
-    ckpt_dir: str,
-    tokenizer_path: str,
-    max_seq_len: int = 10,
-    max_batch_size: int = 32,
+    ckpt_dir,
+    tokenizer_path,
+    max_seq_len,
+    max_batch_size,
 ):
     local_rank, world_size = setup_model_parallel()
     if local_rank > 0:
@@ -94,9 +94,9 @@ def load_the_model(
 def infer_the_model(
     generator, 
     prompts,
-    max_gen_len: int = 256,
-    temperature: float = 0.8,
-    top_p: float = 0.95,
+    max_gen_len,
+    temperature,
+    top_p,
 ):
     results = generator.generate(
         prompts, max_gen_len=max_gen_len, temperature=temperature, top_p=top_p
@@ -108,7 +108,7 @@ def main(
     tokenizer_path: str,
     temperature: float = 0.8,
     top_p: float = 0.95,
-    max_seq_len: int = 512,
+    max_seq_len: int = 10,
     max_batch_size: int = 32,
     max_gen_len: int = 256
 ):
