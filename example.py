@@ -16,21 +16,6 @@ from pathlib import Path
 from fairscale.nn.model_parallel.initialize import initialize_model_parallel
 
 from llama import ModelArgs, Transformer, Tokenizer, LLaMA
-import nvidia_smi
-
-
-nvidia_smi.nvmlInit()
-handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0)
-
-def B2G(num):
-    return round(num/(1024**3),2)
-
-def print_memory(name, handle):
-    info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
-    used = info.used
-    print(f'{name}: {B2G(used)}')
-    print('------------')
-    return used
 
 def setup_model_parallel() -> Tuple[int, int]:
     local_rank = int(os.environ.get("LOCAL_RANK", -1))
@@ -74,8 +59,6 @@ def load(
     torch.set_default_tensor_type(torch.FloatTensor)
     model.load_state_dict(checkpoint, strict=False)
     generator = LLaMA(model, tokenizer)
-    
-    print_memory("load memory", handle)
     return generator
 
 def load_the_model(    
@@ -112,7 +95,7 @@ def main(
     temperature: float = 0.8,
     top_p: float = 0.95,
     max_seq_len: int = 256,
-    max_batch_size: int = 60,
+    max_batch_size: int = 64,
     max_gen_len: int = 256
 ):
     starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
@@ -122,7 +105,7 @@ def main(
     prompts = []
     sum = 0
     while(count < 5*max_batch_size):
-        prompt = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+        prompt = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
         count = count + 1
         prompts.append(prompt)
         if (count % max_batch_size == 0): 
