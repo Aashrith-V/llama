@@ -105,7 +105,7 @@ def main(
     prompts = []
     sum = 0
     while(count < 5*max_batch_size):
-        prompt = ''.join(random.choices(string.ascii_uppercase + string.digits, k=200))
+        prompt = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5000))
         count = count + 1
         prompts.append(prompt)
         if (count % max_batch_size == 0): 
