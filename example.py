@@ -101,9 +101,6 @@ def main(
     max_batch_size: int = 32,
     max_gen_len: int = 256
 ):
-    global mem
-    mem = print_memory('Start', handle)
-
     generator = load_the_model(ckpt_dir, tokenizer_path, max_seq_len, max_batch_size)
     prompt = input("enter prompt > ")
     prompts = [prompt]
