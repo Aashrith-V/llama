@@ -67,8 +67,6 @@ def load(
         max_seq_len=max_seq_len, max_batch_size=max_batch_size, **params
     )
 
-    print_memory("start", handle)
-
     tokenizer = Tokenizer(model_path=tokenizer_path)
     model_args.vocab_size = tokenizer.n_words
     torch.set_default_tensor_type(torch.cuda.HalfTensor)
@@ -76,6 +74,8 @@ def load(
     torch.set_default_tensor_type(torch.FloatTensor)
     model.load_state_dict(checkpoint, strict=False)
     generator = LLaMA(model, tokenizer)
+    
+    print_memory("load memory", handle)
     return generator
 
 def load_the_model(    
@@ -120,6 +120,7 @@ def main(
     generator = load_the_model(ckpt_dir, tokenizer_path, max_seq_len, max_batch_size)
     count = 0
     prompts = []
+    sum = 0
     while(count < 5*max_batch_size):
         prompt = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
         count = count + 1
@@ -132,8 +133,12 @@ def main(
             curr_time = starter.elapsed_time(ender)
             print("time takn for inference : ", curr_time)
             prompts = []
+            sum = sum + curr_time
             # print(results)
             # print("\n==================================\n")
+    print(sum/(5*max_batch_size))
+        
+        
 
 
 if __name__ == "__main__":
