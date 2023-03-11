@@ -85,11 +85,9 @@ def infer_the_model(
     temperature,
     top_p,
 ):
-    start_time = time.time()
     results = generator.generate(
         prompts, max_gen_len=max_gen_len, temperature=temperature, top_p=top_p
     )
-    print(f"Infered in {time.time() - start_time:.2f} seconds")
     return results
 
 def main(
@@ -101,10 +99,18 @@ def main(
     max_batch_size: int = 32,
     max_gen_len: int = 256
 ):
+
+    starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
+
     generator = load_the_model(ckpt_dir, tokenizer_path, max_seq_len, max_batch_size)
     prompt = input("enter prompt > ")
     prompts = [prompt]
+    starter.record()
     results = infer_the_model(generator, prompts, max_gen_len, temperature, top_p)
+    ender.record()
+    torch.cuda.synchronize()
+    curr_time = starter.elapsed_time(ender)
+    print(curr_time)
 
     for result in results:
         print(result)
