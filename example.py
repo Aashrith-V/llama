@@ -107,7 +107,7 @@ def main(
     while(count < 30):
         prompt = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
         count = count + 1
-        promts.append(prompt)
+        prompts.append(prompt)
         if (count % 10 == 0): 
             starter.record()
             results = infer_the_model(generator, prompts, max_gen_len, temperature, top_p)
