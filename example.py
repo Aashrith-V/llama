@@ -17,7 +17,7 @@ from fairscale.nn.model_parallel.initialize import initialize_model_parallel
 from llama import ModelArgs, Transformer, Tokenizer, LLaMA
 
 nvidia_smi.nvmlInit()
-handle = nvidia_smi.nvmlDeviceGetHandleByIndex('cuda:0')
+handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0)
 
 def B2G(num):
     return round(num/(1024**3),2)
