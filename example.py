@@ -19,16 +19,13 @@ from llama import ModelArgs, Transformer, Tokenizer, LLaMA
 nvidia_smi.nvmlInit()
 handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0)
 
-mem = 0
-
 def B2G(num):
     return round(num/(1024**3),2)
 
-def print_memory(name, handle, pre_used):
+def print_memory(name, handle):
     info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
     used = info.used
     print(f'{name}: {B2G(used)}')
-    print(f'This step use: {B2G(used-pre_used)}')
     print('------------')
     return used
 
@@ -53,7 +50,6 @@ def load(
     max_seq_len: int,
     max_batch_size: int,
 ) -> LLaMA:
-    global mem
     start_time = time.time()
     checkpoints = sorted(Path(ckpt_dir).glob("*.pth"))
     assert world_size == len(
@@ -64,7 +60,7 @@ def load(
     checkpoint = torch.load(ckpt_path, map_location="cuda:0")
 
     print(ckpt_path, local_rank, world_size)
-    mem = print_memory("checkpoint", handle, mem)
+    print_memory("checkpoint", handle)
 
     with open(Path(ckpt_dir) / "params.json", "r") as f:
         params = json.loads(f.read())

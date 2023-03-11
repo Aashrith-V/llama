@@ -4,6 +4,7 @@
 from typing import Optional, Tuple
 from dataclasses import dataclass
 import math
+import nvidia_smi
 
 import torch
 from torch import nn
@@ -16,6 +17,18 @@ from fairscale.nn.model_parallel.layers import (
     ColumnParallelLinear,
 )
 
+nvidia_smi.nvmlInit()
+handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0)
+
+def B2G(num):
+    return round(num/(1024**3),2)
+
+def print_memory(name, handle):
+    info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
+    used = info.used
+    print(f'{name}: {B2G(used)}')
+    print('------------')
+    return used
 
 @dataclass
 class ModelArgs:
@@ -202,22 +215,30 @@ class Transformer(nn.Module):
         self.vocab_size = params.vocab_size
         self.n_layers = params.n_layers
 
+        print_memory("tranformer start", handle)
+
         self.tok_embeddings = ParallelEmbedding(
             params.vocab_size, params.dim, init_method=lambda x: x
         )
+        print_memory("parallel embedding", handle)
 
         self.layers = torch.nn.ModuleList()
         for layer_id in range(params.n_layers):
             self.layers.append(TransformerBlock(layer_id, params))
 
+        print_memory("modulelist", handle)
+
         self.norm = RMSNorm(params.dim, eps=params.norm_eps)
         self.output = ColumnParallelLinear(
             params.dim, params.vocab_size, bias=False, init_method=lambda x: x
         )
+        print_memory("rmsnrom", handle)
 
         self.freqs_cis = precompute_freqs_cis(
             self.params.dim // self.params.n_heads, self.params.max_seq_len * 2
         )
+        print_memory("tranformer finish", handle)
+
 
     @torch.inference_mode()
     def forward(self, tokens: torch.Tensor, start_pos: int):
