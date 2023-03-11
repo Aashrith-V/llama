@@ -35,30 +35,14 @@ class LLaMA:
         temperature: float = 0.8,
         top_p: float = 0.95,
     ) -> List[str]:
-
-        print_memory("start", handle)
-
         bsz = len(prompts)
         params = self.model.params
         assert bsz <= params.max_batch_size, (bsz, params.max_batch_size)
-
-        print_memory("assertion", handle)
-    
         prompt_tokens = [self.tokenizer.encode(x, bos=True, eos=False) for x in prompts]
-
-        print_memory("prompt_tokens", handle)
-
-
         min_prompt_size = min([len(t) for t in prompt_tokens])
         max_prompt_size = max([len(t) for t in prompt_tokens])
-
         total_len = min(params.max_seq_len, max_gen_len + max_prompt_size)
-
         tokens = torch.full((bsz, total_len), self.tokenizer.pad_id).cuda().long()
-
-        print_memory("torch_full", handle)
-
-
         for k, t in enumerate(prompt_tokens):
             tokens[k, : len(t)] = torch.tensor(t).long()
         input_text_mask = tokens != self.tokenizer.pad_id
@@ -66,8 +50,6 @@ class LLaMA:
         prev_pos = 0
         for cur_pos in range(start_pos, total_len):
             logits = self.model.forward(tokens[:, prev_pos:cur_pos], prev_pos)
-            print_memory("finish", handle)
-
             if temperature > 0:
                 probs = torch.softmax(logits / temperature, dim=-1)
                 next_token = sample_top_p(probs, top_p)
