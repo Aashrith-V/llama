@@ -112,7 +112,7 @@ def main(
     temperature: float = 0.8,
     top_p: float = 0.95,
     max_seq_len: int = 256,
-    max_batch_size: int = 64,
+    max_batch_size: int = 72,
     max_gen_len: int = 256
 ):
     starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
