@@ -80,7 +80,7 @@ def load(
 def load_the_model(    
     ckpt_dir: str,
     tokenizer_path: str,
-    max_seq_len: int = 512,
+    max_seq_len: int = 10,
     max_batch_size: int = 32,
 ):
     local_rank, world_size = setup_model_parallel()
@@ -94,7 +94,7 @@ def load_the_model(
 def infer_the_model(
     generator, 
     prompts,
-    max_gen_len: int = 10,
+    max_gen_len: int = 256,
     temperature: float = 0.8,
     top_p: float = 0.95,
 ):
