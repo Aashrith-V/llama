@@ -120,8 +120,9 @@ def main(
     print("time taken for inference : ", curr_time)
             # prompts = []
             # sum = sum + curr_time
-    print(results)
-            # print("\n==================================\n")
+    for result in results:
+        print(result)
+        print("\n==================================\n")
     # print(sum/(5*max_batch_size))
         
         
