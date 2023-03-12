@@ -7,21 +7,6 @@ import torch
 
 from llama.tokenizer import Tokenizer
 from llama.model import Transformer
-import nvidia_smi
-
-
-nvidia_smi.nvmlInit()
-handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0)
-
-def B2G(num):
-    return round(num/(1024**3),2)
-
-def print_memory(name, handle):
-    info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
-    used = info.used
-    print(f'{name}: {B2G(used)}')
-    print('------------')
-    return used
 
 class LLaMA:
     def __init__(self, model: Transformer, tokenizer: Tokenizer):
