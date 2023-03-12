@@ -95,7 +95,7 @@ def main(
     temperature: float = 0.8,
     top_p: float = 0.95,
     max_seq_len: int = 256,
-    max_batch_size: int = 64,
+    max_batch_size: int = 1,
     max_gen_len: int = 256
 ):
     starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
@@ -105,7 +105,7 @@ def main(
     prompts = []
     sum = 0
     while(count < 5*max_batch_size):
-        prompt = "Over time, Wikipedia has developed a semiformal dispute resolution process. To determine community consensus, editors can raise issues at appropriate community forums, seek outside input through third opinion requests, or initiate a more general community discussion known as a request for comment.[136] Wikipedia encourages local resolutions of conflicts, which Jemielniak argues is quite unique in organization studies, though there has been some recent interest in consensus building in the field.[137] Joseph Reagle and Sue Gardner argue that the approaches to consensus building are similar to those used by Quakers.[137]:62 A difference from Quaker meetings is the absence of a facilitator in the presence of disagreement, a role played by the clerk in Quaker meetings.[137]:83"
+        prompt = input("input prompt > ")
         count = count + 1
         prompts.append(prompt)
         if (count % max_batch_size == 0): 
