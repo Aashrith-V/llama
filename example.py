@@ -100,24 +100,24 @@ def main(
 
     generator = load_the_model(ckpt_dir, tokenizer_path, max_seq_len, max_batch_size)
     count = 0
-    prompts = []
-    sum = 0
-    while(count < 5*max_batch_size):
-        prompt = input("input prompt > ")
-        count = count + 1
-        prompts.append(prompt)
-        if (count % max_batch_size == 0): 
-            starter.record()
-            results = infer_the_model(generator, prompts, max_gen_len, temperature, top_p)
-            ender.record()
-            torch.cuda.synchronize()
-            curr_time = starter.elapsed_time(ender)
-            print("time takn for inference : ", curr_time)
-            prompts = []
-            sum = sum + curr_time
+    prompts = ["Hello"]
+    # sum = 0
+    # while(count < 5*max_batch_size):
+    #     prompt = input("input prompt > ")
+    #     count = count + 1
+    #     prompts.append(prompt)
+    #     if (count % max_batch_size == 0): 
+    starter.record()
+    results = infer_the_model(generator, prompts, max_gen_len, temperature, top_p)
+    ender.record()
+    torch.cuda.synchronize()
+    curr_time = starter.elapsed_time(ender)
+    print("time taken for inference : ", curr_time)
+            # prompts = []
+            # sum = sum + curr_time
             print(results[0])
             # print("\n==================================\n")
-    print(sum/(5*max_batch_size))
+    # print(sum/(5*max_batch_size))
         
         
 
