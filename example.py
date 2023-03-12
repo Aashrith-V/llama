@@ -115,7 +115,7 @@ def main(
     print("time taken for inference : ", curr_time)
             # prompts = []
             # sum = sum + curr_time
-            print(results[0])
+    print(results[0])
             # print("\n==================================\n")
     # print(sum/(5*max_batch_size))
         
