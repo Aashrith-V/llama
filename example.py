@@ -100,7 +100,7 @@ def main(
 
     generator = load_the_model(ckpt_dir, tokenizer_path, max_seq_len, max_batch_size)
     count = 0
-    prompts = ["Hello"]
+    prompts = ["How to moon walk step by step:"]
     # sum = 0
     # while(count < 5*max_batch_size):
     #     prompt = input("input prompt > ")
