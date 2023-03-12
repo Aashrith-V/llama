@@ -100,7 +100,12 @@ def main(
 
     generator = load_the_model(ckpt_dir, tokenizer_path, max_seq_len, max_batch_size)
     count = 0
-    prompts = ["LLaMA is better than GPT3 because "]
+    prompts = [
+        "Here is a love letter to my wife: ", 
+        "Romantisizing death is really a ", 
+        "An essay about the world dominated by ruthless AI: ", 
+        "Reality is such a pain I would rather ",
+        "Here is today's dark humour: "]
     # sum = 0
     # while(count < 5*max_batch_size):
     #     prompt = input("input prompt > ")
@@ -115,7 +120,7 @@ def main(
     print("time taken for inference : ", curr_time)
             # prompts = []
             # sum = sum + curr_time
-    print(results[0])
+    print(results)
             # print("\n==================================\n")
     # print(sum/(5*max_batch_size))
         
