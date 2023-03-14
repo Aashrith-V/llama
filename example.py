@@ -102,7 +102,7 @@ def main(
     torch.cuda.synchronize()
     curr_time = starter.elapsed_time(ender)
     print("time taken for loading : ", curr_time)
-    
+
     count = 0
     prompts = []
     sum = 0
@@ -119,9 +119,9 @@ def main(
             print("time taken for inference : ", curr_time)
             prompts = []
             sum = sum + curr_time
-        for result in results:
-            print(result)
-            print("\n==================================\n")
+            for result in results:
+                print(result)
+                print("\n==================================\n")
     # print(sum/(5*max_batch_size))
 
 if __name__ == "__main__":
