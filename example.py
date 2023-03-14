@@ -65,14 +65,12 @@ def load_the_model(
     max_seq_len,
     max_batch_size,
 ):
-    start_time = time.time()
     local_rank, world_size = setup_model_parallel()
     if local_rank > 0:
         sys.stdout = open(os.devnull, "w")   
     generator = load(
         ckpt_dir, tokenizer_path, local_rank, world_size, max_seq_len, max_batch_size
     )    
-    print(f"Loaded in {time.time() - start_time:.2f} seconds")
     return generator
 
 def infer_the_model(
@@ -93,40 +91,38 @@ def main(
     temperature: float = 0.8,
     top_p: float = 0.95,
     max_seq_len: int = 256,
-    max_batch_size: int = 5,
+    max_batch_size: int = 64,
     max_gen_len: int = 256
 ):
     starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
 
-    generator = load_the_model(ckpt_dir, tokenizer_path, max_seq_len, max_batch_size)
-    count = 0
-    prompts = [
-        "Here is a love letter to my wife: ", 
-        "Romantisizing death is really a ", 
-        "An essay about the world dominated by ruthless AI: ", 
-        "Reality is such a pain I would rather ",
-        "Here is today's dark humour: "]
-    # sum = 0
-    # while(count < 5*max_batch_size):
-    #     prompt = input("input prompt > ")
-    #     count = count + 1
-    #     prompts.append(prompt)
-    #     if (count % max_batch_size == 0): 
     starter.record()
-    results = infer_the_model(generator, prompts, max_gen_len, temperature, top_p)
+    generator = load_the_model(ckpt_dir, tokenizer_path, max_seq_len, max_batch_size)
     ender.record()
     torch.cuda.synchronize()
     curr_time = starter.elapsed_time(ender)
-    print("time taken for inference : ", curr_time)
-            # prompts = []
-            # sum = sum + curr_time
-    for result in results:
-        print(result)
-        print("\n==================================\n")
+    print("time taken for loading : ", curr_time)
+    
+    count = 0
+    prompts = []
+    sum = 0
+    while(count < 5*max_batch_size):
+        prompt = input("input prompt > ")
+        count = count + 1
+        prompts.append(prompt)
+        if (count % max_batch_size == 0): 
+            starter.record()
+            results = infer_the_model(generator, prompts, max_gen_len, temperature, top_p)
+            ender.record()
+            torch.cuda.synchronize()
+            curr_time = starter.elapsed_time(ender)
+            print("time taken for inference : ", curr_time)
+            prompts = []
+            sum = sum + curr_time
+        for result in results:
+            print(result)
+            print("\n==================================\n")
     # print(sum/(5*max_batch_size))
-        
-        
-
 
 if __name__ == "__main__":
     fire.Fire(main)
